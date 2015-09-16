@@ -36,7 +36,7 @@ ABikeV3Pawn::ABikeV3Pawn()
 	GetMesh()->SetSkeletalMesh(CarMesh.Object);
 	
 	//TODO Fix autoload of anim BP, currently not loading
-	static ConstructorHelpers::FClassFinder<UClass> BikeAnim(TEXT("/Game/Bike/Bike_Anim_BP.Bike_Anim_BP"));
+	static ConstructorHelpers::FClassFinder<UClass> BikeAnim(TEXT("/Game/Bike/Bike_Anim_BP"));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetAnimInstanceClass(BikeAnim.Class);
 
@@ -181,7 +181,7 @@ void ABikeV3Pawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 //TODO Make custom movement, don't use engine
 void ABikeV3Pawn::MoveForward(float Val)
 {
-	GetVehicleMovementComponent()->SetThrottleInput(Val);
+	GetVehicleMovementComponent()->AddInputVector(FVector(100.f, 0.f, 0.f)*Val);
 
 }
 
