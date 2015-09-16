@@ -99,7 +99,7 @@ public:
 	// Handle Gearing
 	void ShiftUp();
 	void ShiftDown();
-	void ChangeGear();
+	void UpdateBikeOrientation();
 
 	static const FName LookUpBinding;
 	static const FName LookRightBinding;

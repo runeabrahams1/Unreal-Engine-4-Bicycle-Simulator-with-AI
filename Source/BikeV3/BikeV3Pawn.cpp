@@ -262,6 +262,9 @@ void ABikeV3Pawn::Tick(float Delta)
 	// Set the string in the incar hud
 	SetupInCarHUD();
 
+	//Hold bike standing
+	UpdateBikeOrientation();
+
 	bool bHMDActive = false;
 #ifdef HMD_INTGERATION
 	if ((GEngine->HMDDevice.IsValid() == true ) && ( (GEngine->HMDDevice->IsHeadTrackingAllowed() == true) || (GEngine->IsStereoscopic3D() == true)))
@@ -362,6 +365,18 @@ void ABikeV3Pawn::UpdatePhysicsMaterial()
 			GetMesh()->SetPhysMaterialOverride(SlipperyMaterial);
 			bIsLowFriction = true;
 		}
+	}
+}
+
+void ABikeV3Pawn::UpdateBikeOrientation()
+{
+	if (GetMesh()->GetComponentRotation().Roll > 0)
+	{
+		GetMesh()->SetAllPhysicsRotation(FRotator(GetMesh()->GetComponentRotation().Pitch, GetMesh()->GetComponentRotation().Yaw, GetMesh()->GetComponentRotation().Roll - 0.5f));
+	}
+	if (GetMesh()->GetComponentRotation().Roll < -0.1)
+	{
+		GetMesh()->SetAllPhysicsRotation(FRotator(GetMesh()->GetComponentRotation().Pitch, GetMesh()->GetComponentRotation().Yaw, GetMesh()->GetComponentRotation().Roll + 0.5f));
 	}
 }
 
