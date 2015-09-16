@@ -96,6 +96,10 @@ public:
 	void OnToggleCamera();
 	/** Handle reset VR device */
 	void OnResetVR();
+	// Handle Gearing
+	void ShiftUp();
+	void ShiftDown();
+	void ChangeGear();
 
 	static const FName LookUpBinding;
 	static const FName LookRightBinding;

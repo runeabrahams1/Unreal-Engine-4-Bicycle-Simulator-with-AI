@@ -78,12 +78,11 @@ ABikeV3Pawn::ABikeV3Pawn()
 
 	// Engine 
 	// Torque setup
-	// Ignore this, will not be used
-	Vehicle4W->MaxEngineRPM = 5700.0f;
+	Vehicle4W->MaxEngineRPM = 500.f;
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->Reset();
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(0.0f, 400.0f);
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(1890.0f, 500.0f);
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(5730.0f, 400.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(200.f, 500.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(500.f, 400.0f);
  
 	// Adjust the steering 
 	Vehicle4W->SteeringCurve.GetRichCurve()->Reset();
@@ -94,10 +93,8 @@ ABikeV3Pawn::ABikeV3Pawn()
  	// Transmission, TODO( Adjust if you go to 2 wheels)
 	Vehicle4W->DifferentialSetup.DifferentialType = EVehicleDifferential4W::Open_RearDrive;
 
-	// Automatic gearbox
-	Vehicle4W->TransmissionSetup.bUseGearAutoBox = true;
+	Vehicle4W->TransmissionSetup.bUseGearAutoBox = false;
 	Vehicle4W->TransmissionSetup.GearSwitchTime = 1.0f;
-	Vehicle4W->TransmissionSetup.GearAutoBoxLatency = 0.5f;
 
 	// Physics settings
 	// Adjust the center of mass, find a good position
@@ -174,20 +171,36 @@ void ABikeV3Pawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 	InputComponent->BindAction("Handbrake", IE_Pressed, this, &ABikeV3Pawn::OnHandbrakePressed);
 	InputComponent->BindAction("Handbrake", IE_Released, this, &ABikeV3Pawn::OnHandbrakeReleased);
 	InputComponent->BindAction("SwitchCamera", IE_Pressed, this, &ABikeV3Pawn::OnToggleCamera);
-
+	InputComponent->BindAction("ShiftUp", IE_Pressed, this, &ABikeV3Pawn::ShiftUp);
+	InputComponent->BindAction("ShiftDown", IE_Pressed, this, &ABikeV3Pawn::ShiftDown);
 	InputComponent->BindAction("ResetVR", IE_Pressed, this, &ABikeV3Pawn::OnResetVR); 
 }
 
 //TODO Make custom movement, don't use engine
 void ABikeV3Pawn::MoveForward(float Val)
 {
-	GetVehicleMovementComponent()->AddInputVector(FVector(100.f, 0.f, 0.f)*Val);
-
+	GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
 void ABikeV3Pawn::MoveRight(float Val)
 {
 	GetVehicleMovementComponent()->SetSteeringInput(Val);
+}
+
+void ABikeV3Pawn::ShiftUp()
+{
+	if (GetVehicleMovementComponent()->GetCurrentGear() < 5)
+	{
+		GetVehicleMovementComponent()->SetTargetGear(GetVehicleMovementComponent()->GetCurrentGear() + 1, true);
+	}
+}
+
+void ABikeV3Pawn::ShiftDown()
+{
+	if (GetVehicleMovementComponent()->GetCurrentGear() > -1)
+	{
+		GetVehicleMovementComponent()->SetTargetGear(GetVehicleMovementComponent()->GetCurrentGear() - 1, true);
+	}
 }
 
 //TODO Try to amke ABS like brakes
