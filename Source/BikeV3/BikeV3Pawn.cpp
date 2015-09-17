@@ -25,9 +25,8 @@
 
 const FName ABikeV3Pawn::LookUpBinding("LookUp");
 const FName ABikeV3Pawn::LookRightBinding("LookRight");
-const FName ABikeV3Pawn::EngineAudioRPM("RPM");
 
-#define LOCTEXT_NAMESPACE "VehiclePawn"
+#define LOCTEXT_NAMESPACE "BikePawn"
 
 ABikeV3Pawn::ABikeV3Pawn()
 {
@@ -36,7 +35,7 @@ ABikeV3Pawn::ABikeV3Pawn()
 	GetMesh()->SetSkeletalMesh(CarMesh.Object);
 	
 	//TODO Fix autoload of anim BP, currently not loading
-	static ConstructorHelpers::FClassFinder<UClass> BikeAnim(TEXT("/Game/Bike/Bike_Anim_BP"));
+	static ConstructorHelpers::FClassFinder<UClass> BikeAnim(TEXT("/Game/Bike/bike_Anim_BP.bike_Anim_BP"));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetAnimInstanceClass(BikeAnim.Class);
 
@@ -78,7 +77,7 @@ ABikeV3Pawn::ABikeV3Pawn()
 
 	// Engine 
 	// Torque setup
-	Vehicle4W->MaxEngineRPM = 500.f;
+	Vehicle4W->MaxEngineRPM = 500.0f;
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->Reset();
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(0.0f, 400.0f);
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(200.f, 500.0f);
@@ -112,7 +111,7 @@ ABikeV3Pawn::ABikeV3Pawn()
 	SpringArm->SetRelativeLocation(FVector(-50.0f, 0.0f, 254.0f));
 	SpringArm->SetWorldRotation(FRotator(-20.0f, 0.0f, 0.0f));
 	SpringArm->AttachTo(RootComponent);
-	SpringArm->TargetArmLength = 125.0f;
+	SpringArm->TargetArmLength = 128.0f;
 	SpringArm->bEnableCameraLag = false;
 	SpringArm->bEnableCameraRotationLag = false;
 	SpringArm->bInheritPitch = true;
@@ -370,14 +369,7 @@ void ABikeV3Pawn::UpdatePhysicsMaterial()
 
 void ABikeV3Pawn::UpdateBikeOrientation()
 {
-	if (GetMesh()->GetComponentRotation().Roll > 0)
-	{
-		GetMesh()->SetAllPhysicsRotation(FRotator(GetMesh()->GetComponentRotation().Pitch, GetMesh()->GetComponentRotation().Yaw, GetMesh()->GetComponentRotation().Roll - 0.5f));
-	}
-	if (GetMesh()->GetComponentRotation().Roll < -0.1)
-	{
-		GetMesh()->SetAllPhysicsRotation(FRotator(GetMesh()->GetComponentRotation().Pitch, GetMesh()->GetComponentRotation().Yaw, GetMesh()->GetComponentRotation().Roll + 0.5f));
-	}
+		GetMesh()->SetAllPhysicsRotation(FRotator(GetMesh()->GetComponentRotation().Pitch, GetMesh()->GetComponentRotation().Yaw, 0));
 }
 
 #undef LOCTEXT_NAMESPACE

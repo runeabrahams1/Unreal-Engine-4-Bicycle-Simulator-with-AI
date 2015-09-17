@@ -7,12 +7,12 @@
 UBikeV3WheelFront::UBikeV3WheelFront()
 {
 	ShapeRadius = 75.0f;
-	ShapeWidth = 20.0f;
+	ShapeWidth = 16.0f;
 	bAffectedByHandbrake = false;
-	SteerAngle = 55.0f;
+	SteerAngle = 70.0f;
 
 	// Setup suspension forces
-	SuspensionForceOffset = -4.0f;
+	SuspensionForceOffset = -5.0f;
 	SuspensionMaxRaise = 10.0f;
 	SuspensionMaxDrop = 10.0f;
 	SuspensionNaturalFrequency = 9.0f;
