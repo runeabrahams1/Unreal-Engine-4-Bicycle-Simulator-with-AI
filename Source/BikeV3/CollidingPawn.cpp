@@ -12,25 +12,17 @@ ACollidingPawn::ACollidingPawn()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Our root component will be a sphere that reacts to physics
-	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
-	RootComponent = SphereComponent;
-	SphereComponent->InitSphereRadius(40.0f);
-	SphereComponent->SetCollisionProfileName(TEXT("Pawn"));
-
-	// Create and position a mesh component so we can see where our sphere is
-	UStaticMeshComponent* SphereVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
-	SphereVisual->AttachTo(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
-	if (SphereVisualAsset.Succeeded())
-	{
-		SphereVisual->SetStaticMesh(SphereVisualAsset.Object);
-		SphereVisual->SetRelativeLocation(FVector(0.0f, 0.0f, -40.0f));
-		SphereVisual->SetWorldScale3D(FVector(0.8f));
-	}
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> BikeMesh(TEXT("/Game/Bike/bike_skeletal_meshV2.bike_skeletal_meshV2"));
+	BikeComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RootComponent"));
+	BikeComponent->SetSkeletalMesh(BikeMesh.Object);
+	BikeComponent->SetSimulatePhysics(true);
+	BikeComponent->SetCollisionProfileName(TEXT("Pawn"));
+	RootComponent = BikeComponent;
+	
 
 	// Create a particle system that we can activate or deactivate
 	OurParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("MovementParticles"));
-	OurParticleSystem->AttachTo(SphereVisual);
+	OurParticleSystem->AttachTo(RootComponent);
 	OurParticleSystem->bAutoActivate = false;
 	OurParticleSystem->SetRelativeLocation(FVector(-20.0f, 0.0f, 20.0f));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Game/StarterContent/Particles/P_Fire.P_Fire"));
@@ -41,7 +33,8 @@ ACollidingPawn::ACollidingPawn()
 
 	// Use a spring arm to give the camera smooth, natural-feeling motion.
 	USpringArmComponent* SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraAttachmentArm"));
-	SpringArm->AttachTo(RootComponent);
+	SpringArm->AttachTo(BikeComponent);
+	SpringArm->RelativeLocation = FVector(0, 0, 128);
 	SpringArm->RelativeRotation = FRotator(-45.f, 0.f, 0.f);
 	SpringArm->TargetArmLength = 400.0f;
 	SpringArm->bEnableCameraLag = true;
@@ -56,8 +49,9 @@ ACollidingPawn::ACollidingPawn()
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 	// Create an instance of our movement component, and tell it to update the root.
-	OurMovementComponent = CreateDefaultSubobject<UCollidingPawnMovementComponent>(TEXT("CustomMovementComponent"));
-	OurMovementComponent->UpdatedComponent = RootComponent;
+	OurMovementComponent = CreateDefaultSubobject<UCollidingPawnMovementComponent>(TEXT("BikeMovementComponent"));
+	OurMovementComponent->UpdatedComponent = BikeComponent;
+
 }
 
 UPawnMovementComponent* ACollidingPawn::GetMovementComponent() const
@@ -76,7 +70,9 @@ void ACollidingPawn::BeginPlay()
 void ACollidingPawn::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
+	FRotator newRot = BikeComponent->GetComponentRotation();
+	newRot.Roll = 0;
+	BikeComponent->SetAllPhysicsRotation(newRot);
 }
 
 // Called to bind functionality to input
@@ -93,25 +89,25 @@ void ACollidingPawn::SetupPlayerInputComponent(class UInputComponent* InputCompo
 
 void ACollidingPawn::MoveForward(float AxisValue)
 {
-	if (OurMovementComponent && (OurMovementComponent->UpdatedComponent == RootComponent))
+	if (Controller != NULL)
 	{
-		OurMovementComponent->AddInputVector(GetActorForwardVector() * AxisValue);
+		FVector Direction = BikeComponent->GetForwardVector()*400*AxisValue;
+		BikeComponent->SetPhysicsLinearVelocity(Direction, false, FName("PhyWheel_B"));
 	}
 }
 
 void ACollidingPawn::MoveRight(float AxisValue)
 {
-	if (OurMovementComponent && (OurMovementComponent->UpdatedComponent == RootComponent))
+	if (Controller != NULL && AxisValue != 0.f)
 	{
-		OurMovementComponent->AddInputVector(GetActorRightVector() * AxisValue);
+		FRotator Rotation = BikeComponent->GetComponentRotation();
+		Rotation.Yaw += AxisValue;
+		BikeComponent->SetAllPhysicsRotation(Rotation);
 	}
 }
 
 void ACollidingPawn::Turn(float AxisValue)
 {
-	FRotator NewRotation = GetActorRotation();
-	NewRotation.Yaw += AxisValue;
-	SetActorRotation(NewRotation);
 }
 
 void ACollidingPawn::ParticleToggle()

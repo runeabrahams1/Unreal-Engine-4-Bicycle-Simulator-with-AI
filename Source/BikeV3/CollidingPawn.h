@@ -10,10 +10,8 @@ class BIKEV3_API ACollidingPawn : public APawn
 {
 	GENERATED_BODY()
 
-		UPROPERTY(Category = Root, VisibleDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-		USphereComponent* SphereComponent;
-
-
+	UPROPERTY(Category = Root, VisibleDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* BikeComponent;
 
 public:
 	// Sets default values for this pawn's properties
