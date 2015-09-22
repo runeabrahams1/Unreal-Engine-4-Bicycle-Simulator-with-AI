@@ -1,8 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Engine.h"
 #include "BikeV3.h"
 #include "CollidingPawn.h"
 #include "CollidingPawnMovementComponent.h"
+
+#define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White,text)
 
 
 // Sets default values
@@ -17,8 +20,7 @@ ACollidingPawn::ACollidingPawn()
 	BikeComponent->SetSkeletalMesh(BikeMesh.Object);
 	BikeComponent->SetSimulatePhysics(true);
 	BikeComponent->SetCollisionProfileName(TEXT("Pawn"));
-	RootComponent = BikeComponent;
-	
+	SetRootComponent(BikeComponent);
 
 	// Create a particle system that we can activate or deactivate
 	OurParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("MovementParticles"));
@@ -33,7 +35,7 @@ ACollidingPawn::ACollidingPawn()
 
 	// Use a spring arm to give the camera smooth, natural-feeling motion.
 	USpringArmComponent* SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraAttachmentArm"));
-	SpringArm->AttachTo(BikeComponent);
+	SpringArm->AttachTo(RootComponent);
 	SpringArm->RelativeLocation = FVector(0, 0, 128);
 	SpringArm->RelativeRotation = FRotator(-45.f, 0.f, 0.f);
 	SpringArm->TargetArmLength = 400.0f;
@@ -50,7 +52,7 @@ ACollidingPawn::ACollidingPawn()
 
 	// Create an instance of our movement component, and tell it to update the root.
 	OurMovementComponent = CreateDefaultSubobject<UCollidingPawnMovementComponent>(TEXT("BikeMovementComponent"));
-	OurMovementComponent->UpdatedComponent = BikeComponent;
+	OurMovementComponent->UpdatedComponent = RootComponent;
 
 }
 
@@ -70,9 +72,9 @@ void ACollidingPawn::BeginPlay()
 void ACollidingPawn::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	FRotator newRot = BikeComponent->GetComponentRotation();
-	newRot.Roll = 0;
-	BikeComponent->SetAllPhysicsRotation(newRot);
+	//FRotator newRot = BikeComponent->GetComponentRotation();
+	//newRot.Roll = 0;
+	//BikeComponent->SetAllPhysicsRotation(newRot);
 }
 
 // Called to bind functionality to input
@@ -89,10 +91,12 @@ void ACollidingPawn::SetupPlayerInputComponent(class UInputComponent* InputCompo
 
 void ACollidingPawn::MoveForward(float AxisValue)
 {
-	if (Controller != NULL)
+	if (OurMovementComponent != NULL && AxisValue != 0.f)
 	{
-		FVector Direction = BikeComponent->GetForwardVector()*400*AxisValue;
-		BikeComponent->SetPhysicsLinearVelocity(Direction, false, FName("PhyWheel_B"));
+		print("forward");
+		FVector Direction = BikeComponent->GetForwardVector()*500*AxisValue;
+		BikeComponent->SetPhysicsLinearVelocity(Direction, false);
+		OurMovementComponent->AddInputVector(Direction);
 	}
 }
 
@@ -101,7 +105,7 @@ void ACollidingPawn::MoveRight(float AxisValue)
 	if (Controller != NULL && AxisValue != 0.f)
 	{
 		FRotator Rotation = BikeComponent->GetComponentRotation();
-		Rotation.Yaw += AxisValue;
+		Rotation.Yaw += AxisValue*2;
 		BikeComponent->SetAllPhysicsRotation(Rotation);
 	}
 }

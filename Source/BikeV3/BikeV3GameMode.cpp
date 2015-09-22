@@ -2,11 +2,13 @@
 
 #include "BikeV3.h"
 #include "BikeV3GameMode.h"
-#include "BikeV3Pawn.h"
+#include "CollidingPawn.h"
+#include "BikePlayerController.h"
 #include "BikeV3Hud.h"
 
 ABikeV3GameMode::ABikeV3GameMode()
 {
-	DefaultPawnClass = ABikeV3Pawn::StaticClass();
+	DefaultPawnClass = ACollidingPawn::StaticClass();
 	HUDClass = ABikeV3Hud::StaticClass();
+	PlayerControllerClass = ABikePlayerController::StaticClass();
 }
