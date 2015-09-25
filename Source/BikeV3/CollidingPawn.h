@@ -13,6 +13,9 @@ class BIKEV3_API ACollidingPawn : public APawn
 	UPROPERTY(Category = Root, VisibleDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* BikeComponent;
 
+	UPROPERTY(Category = Constraints, EditAnywhere, meta = (AllowPrivateAcces = "true"))
+	UPhysicsConstraintComponent* TwistConstraint;
+
 public:
 	// Sets default values for this pawn's properties
 	ACollidingPawn();
@@ -27,14 +30,19 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	UParticleSystemComponent *OurParticleSystem;
+	class UBikeAnimInstance *BikeAnimation;
 
 	class UCollidingPawnMovementComponent* OurMovementComponent;
 
 	virtual UPawnMovementComponent* GetMovementComponent() const override;
 
+	UFUNCTION()
 	void MoveForward(float AxisValue);
+	UFUNCTION()
 	void MoveRight(float AxisValue);
+	UFUNCTION()
 	void Turn(float AxisValue);
+	UFUNCTION()
 	void ParticleToggle();
 	
 };

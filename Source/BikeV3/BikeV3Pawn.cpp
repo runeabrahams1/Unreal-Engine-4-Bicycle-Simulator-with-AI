@@ -35,7 +35,7 @@ ABikeV3Pawn::ABikeV3Pawn()
 	GetMesh()->SetSkeletalMesh(CarMesh.Object);
 	
 	//TODO Fix autoload of anim BP, currently not loading
-	static ConstructorHelpers::FClassFinder<UClass> BikeAnim(TEXT("/Game/Bike/bike_Anim_BP.bike_Anim_BP"));
+	static ConstructorHelpers::FClassFinder<UClass> BikeAnim(TEXT("/Game/Bike/Bike_Anim_BP.Bike_Anim_BP_C"));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetAnimInstanceClass(BikeAnim.Class);
 
