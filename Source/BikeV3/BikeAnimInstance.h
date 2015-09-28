@@ -4,17 +4,15 @@
 
 #include "Animation/AnimInstance.h"
 #include "BikeAnimInstance.generated.h"
-
-/**
- * 
- */
-UCLASS()
+//////////////////////////////////////////////////////////
+// UBikeAnimInstance
+UCLASS()  
 class BIKEV3_API UBikeAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
 	UBikeAnimInstance();
-	
+
 public:
 	/** Front Wheel Rotation */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wheel)
@@ -27,5 +25,4 @@ public:
 	/** Handle Rotation */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Wheel)
 	FRotator SkelControl_HandleRot;
-	
 };

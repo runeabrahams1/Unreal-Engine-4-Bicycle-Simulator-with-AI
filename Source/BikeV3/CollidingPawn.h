@@ -4,7 +4,6 @@
 
 #include "GameFramework/Pawn.h"
 #include "CollidingPawn.generated.h"
-
 UCLASS(config=Game)
 class BIKEV3_API ACollidingPawn : public APawn
 {
@@ -30,7 +29,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	UParticleSystemComponent *OurParticleSystem;
-	class UBikeAnimInstance *BikeAnimation;
 
 	class UCollidingPawnMovementComponent* OurMovementComponent;
 

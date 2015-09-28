@@ -33,11 +33,7 @@ ABikeV3Pawn::ABikeV3Pawn()
 	// Bike mesh
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/Bike/bike_skeletal_meshV2.bike_skeletal_meshV2"));
 	GetMesh()->SetSkeletalMesh(CarMesh.Object);
-	
-	//TODO Fix autoload of anim BP, currently not loading
-	static ConstructorHelpers::FClassFinder<UClass> BikeAnim(TEXT("/Game/Bike/Bike_Anim_BP.Bike_Anim_BP_C"));
-	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	GetMesh()->SetAnimInstanceClass(BikeAnim.Class);
+
 
 	// Setup friction materials
 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> SlipperyMat(TEXT("/Game/VehicleAdv/PhysicsMaterials/Slippery.Slippery"));
