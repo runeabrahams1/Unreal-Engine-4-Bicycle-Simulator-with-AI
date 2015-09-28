@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Engine.h"
 #include "BikeV3.h"
+#include "Engine.h"
 #include "CollidingPawn.h"
 #include "CollidingPawnMovementComponent.h"
 
@@ -72,9 +72,9 @@ void ACollidingPawn::BeginPlay()
 void ACollidingPawn::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	//FRotator newRot = BikeComponent->GetComponentRotation();
-	//newRot.Roll = 0;
-	//BikeComponent->SetAllPhysicsRotation(newRot);
+	FRotator newRot = BikeComponent->GetComponentRotation();
+	newRot.Roll = 0;
+	BikeComponent->SetAllPhysicsRotation(newRot);
 }
 
 // Called to bind functionality to input
@@ -96,13 +96,13 @@ void ACollidingPawn::MoveForward(float AxisValue)
 		print("forward");
 		FVector Direction = BikeComponent->GetForwardVector()*500*AxisValue;
 		BikeComponent->SetPhysicsLinearVelocity(Direction, false);
-		OurMovementComponent->AddInputVector(Direction);
+		//OurMovementComponent->AddInputVector(Direction);
 	}
 }
 
 void ACollidingPawn::MoveRight(float AxisValue)
 {
-	if (Controller != NULL && AxisValue != 0.f)
+	if (OurMovementComponent != NULL && AxisValue != 0.f)
 	{
 		FRotator Rotation = BikeComponent->GetComponentRotation();
 		Rotation.Yaw += AxisValue*2;
