@@ -82,15 +82,13 @@ void ACollidingPawn::BeginPlay()
 void ACollidingPawn::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	FRotator newTarget = FRotator(BikeComponent->GetForwardVector().Y, BikeComponent->GetForwardVector().Z, 0);
-	TwistConstraint->SetAngularOrientationTarget(newTarget);
 	
 	if (!BikeComponent) return;
 	UBikeAnimInstance * Anim = Cast<UBikeAnimInstance>(BikeComponent->GetAnimInstance());
 	if (!Anim) return;
 	FRotator newTurnF = Anim->SkelControl_WheelRot_F;
 	FRotator newTurnB = Anim->SkelControl_WheelRot_B;
-	if (RootComponent->GetComponentVelocity().X > 0)
+	if (RootComponent->GetForwardVector().X > 0)
 	{
 		newTurnF.Pitch -= RootComponent->GetComponentVelocity().Size() / 75.f;
 		newTurnB.Pitch -= RootComponent->GetComponentVelocity().Size() / 75.f;
@@ -102,6 +100,9 @@ void ACollidingPawn::Tick( float DeltaTime )
 	}
 	Anim->SkelControl_WheelRot_F = newTurnF;
 	Anim->SkelControl_WheelRot_B = newTurnB;
+
+	FRotator newTarget = FRotator(0.f, newTurnF.Yaw, 0);
+	TwistConstraint->SetAngularOrientationTarget(newTarget);
 }
 
 // Called to bind functionality to input
@@ -120,28 +121,38 @@ void ACollidingPawn::MoveForward(float AxisValue)
 {
 	if (AxisValue != 0.f && BikeComponent->GetPhysicsLinearVelocity().Size() < 500)
 	{
-		FVector Direction = BikeComponent->GetForwardVector()*AxisValue*400;
+		FVector Direction = BikeComponent->GetForwardVector()*FMath::Clamp(AxisValue,0.f,1.f)*400;
 		BikeComponent->AddImpulse(Direction, FName("PhyWheel_B"), true);
 	}
+
 }
 
 void ACollidingPawn::MoveRight(float AxisValue)
 {
+	FRotator rot = BikeComponent->GetComponentRotation();
+	rot.Yaw += AxisValue * 3;
+	BikeComponent->SetAllPhysicsRotation(rot);
+	
 	if (!BikeComponent) return;
 	UBikeAnimInstance * Anim = Cast<UBikeAnimInstance>(BikeComponent->GetAnimInstance());
 	if (!Anim) return;
 	FRotator newTurn = Anim->SkelControl_WheelRot_F;
-	newTurn.Yaw =  FMath::Clamp(AxisValue, -1.f, 1.f) * 70;
+	newTurn.Yaw = FMath::Clamp(AxisValue, -1.f, 1.f) * 70;
 	Anim->SkelControl_WheelRot_F = newTurn;
+	/**
 	int32 BodySetupIdx = BikeComponent->GetPhysicsAsset()->FindBodyIndex(FName("PhyWHeel_F"));
 	if (BodySetupIdx >= 0)
 	{
-		print("got bone");
 		FBodyInstance* BodyInstance = BikeComponent->Bodies[BodySetupIdx];
-		FQuat newRot = BodyInstance->GetUnrealWorldTransform().GetRotation();
+		FQuat newRot = FQuat(0, 0, 0, 1);
 		newRot.Z = FMath::Clamp(AxisValue, -1.f, 1.f) * 70;
+		int32 something;
 		BodyInstance->GetUnrealWorldTransform().SetRotation(newRot);
+		TArray<physx::PxShape*> shapes = BodyInstance->GetAllShapes(something);
+		physx::PxShape* shape;
+		shape = shapes.Last();
 	}
+	*/
 }
 
 void ACollidingPawn::Turn(float AxisValue)
