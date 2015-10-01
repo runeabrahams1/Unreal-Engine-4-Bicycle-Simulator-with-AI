@@ -96,7 +96,7 @@ public:
 	void OnToggleCamera();
 	/** Handle reset VR device */
 	void OnResetVR();
-	// Handle Gearing
+	/** Handle Gearing */
 	void ShiftUp();
 	void ShiftDown();
 	void UpdateBikeOrientation();

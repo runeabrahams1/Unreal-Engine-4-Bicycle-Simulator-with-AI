@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "Animation/AnimInstance.h"
+#include "Vehicles/VehicleAnimInstance.h"
 #include "BikeAnimInstance.generated.h"
 //////////////////////////////////////////////////////////
 // UBikeAnimInstance
 UCLASS()  
-class BIKEV3_API UBikeAnimInstance : public UAnimInstance
+class BIKEV3_API UBikeAnimInstance : public UVehicleAnimInstance
 {
 	GENERATED_BODY()
 
