@@ -4,6 +4,7 @@
 
 #include "GameFramework/Pawn.h"
 #include "CollidingPawn.generated.h"
+
 UCLASS(config=Game)
 class BIKEV3_API ACollidingPawn : public APawn
 {

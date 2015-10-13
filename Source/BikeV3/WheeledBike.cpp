@@ -25,6 +25,7 @@ AWheeledBike::AWheeledBike(const FObjectInitializer &initilaizer) : Super(initil
 
 	// Take control of the default player
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
 
 	UBikeMovementComponent* BikeMovement = CastChecked<UBikeMovementComponent>(GetVehicleMovement());
 
@@ -83,6 +84,7 @@ AWheeledBike::AWheeledBike(const FObjectInitializer &initilaizer) : Super(initil
 	Camera->SetRelativeRotation(FRotator(10.0f, 0.0f, 0.0f));
 	Camera->bUsePawnControlRotation = false;
 	Camera->FieldOfView = 90.f;
+
 }
 
 void AWheeledBike::Tick(float DeltaTime)
@@ -107,8 +109,9 @@ void AWheeledBike::Tick(float DeltaTime)
 	Anim->SkelControl_WheelRot_F = newTurnF;
 	Anim->SkelControl_WheelRot_B = newTurnB;
 
-	FRotator newTarget = FRotator(0.f, newTurnF.Yaw, 0);
+	FRotator newTarget = FRotator(GetActorRotation().Pitch, GetActorRotation().Yaw, 0);
 	TwistConstraint->SetAngularOrientationTarget(newTarget);
+	//GetVehicleMovementComponent()->TickVehicle(DeltaTime);
 }
 
 // Called when the game starts or when spawned

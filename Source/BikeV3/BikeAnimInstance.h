@@ -6,6 +6,10 @@
 #include "BikeAnimInstance.generated.h"
 //////////////////////////////////////////////////////////
 // UBikeAnimInstance
+
+
+
+
 UCLASS()  
 class BIKEV3_API UBikeAnimInstance : public UVehicleAnimInstance
 {

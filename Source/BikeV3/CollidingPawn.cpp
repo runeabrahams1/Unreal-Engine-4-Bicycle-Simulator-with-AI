@@ -64,6 +64,8 @@ ACollidingPawn::ACollidingPawn()
 	// Animation Instance
 	static ConstructorHelpers::FObjectFinder<UAnimBlueprintGeneratedClass> BikeAnimBP(TEXT("/Game/Bike/BikeAnimBP.BikeAnimBP_C"));
 	BikeComponent->AnimBlueprintGeneratedClass = BikeAnimBP.Object;
+
+	
 }
 
 UPawnMovementComponent* ACollidingPawn::GetMovementComponent() const
@@ -101,7 +103,7 @@ void ACollidingPawn::Tick( float DeltaTime )
 	Anim->SkelControl_WheelRot_F = newTurnF;
 	Anim->SkelControl_WheelRot_B = newTurnB;
 
-	FRotator newTarget = FRotator(0.f, newTurnF.Yaw, 0);
+	FRotator newTarget = FRotator(GetActorRotation().Pitch, GetActorRotation().Yaw, 0);
 	TwistConstraint->SetAngularOrientationTarget(newTarget);
 }
 
@@ -129,30 +131,22 @@ void ACollidingPawn::MoveForward(float AxisValue)
 
 void ACollidingPawn::MoveRight(float AxisValue)
 {
-	FRotator rot = BikeComponent->GetComponentRotation();
-	rot.Yaw += AxisValue * 3;
-	BikeComponent->SetAllPhysicsRotation(rot);
-	
 	if (!BikeComponent) return;
 	UBikeAnimInstance * Anim = Cast<UBikeAnimInstance>(BikeComponent->GetAnimInstance());
 	if (!Anim) return;
 	FRotator newTurn = Anim->SkelControl_WheelRot_F;
 	newTurn.Yaw = FMath::Clamp(AxisValue, -1.f, 1.f) * 70;
 	Anim->SkelControl_WheelRot_F = newTurn;
-	/**
+	
 	int32 BodySetupIdx = BikeComponent->GetPhysicsAsset()->FindBodyIndex(FName("PhyWHeel_F"));
 	if (BodySetupIdx >= 0)
 	{
 		FBodyInstance* BodyInstance = BikeComponent->Bodies[BodySetupIdx];
-		FQuat newRot = FQuat(0, 0, 0, 1);
-		newRot.Z = FMath::Clamp(AxisValue, -1.f, 1.f) * 70;
-		int32 something;
-		BodyInstance->GetUnrealWorldTransform().SetRotation(newRot);
-		TArray<physx::PxShape*> shapes = BodyInstance->GetAllShapes(something);
-		physx::PxShape* shape;
-		shape = shapes.Last();
+		FRotator newRot = FRotator(0, GetActorRotation().Yaw + FMath::Clamp(AxisValue, -1.f, 1.f) * 70, 0);
+		FTransform newTrans = BodyInstance->GetUnrealWorldTransform();
+		newTrans.SetRotation(newRot.Quaternion());
+		BodyInstance->SetBodyTransform(newTrans, true);
 	}
-	*/
 }
 
 void ACollidingPawn::Turn(float AxisValue)
