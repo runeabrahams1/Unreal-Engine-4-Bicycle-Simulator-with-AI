@@ -7,6 +7,7 @@
 #include "BikeAnimInstance.h"
 
 #define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White,text)
+#define MAX_TURN 70
 
 
 // Sets default values
@@ -22,17 +23,6 @@ ACollidingPawn::ACollidingPawn()
 	BikeComponent->SetSimulatePhysics(true);
 	BikeComponent->SetCollisionProfileName(TEXT("Pawn"));
 	SetRootComponent(BikeComponent);
-
-	// Create a particle system that we can activate or deactivate
-	OurParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("MovementParticles"));
-	OurParticleSystem->AttachTo(RootComponent);
-	OurParticleSystem->bAutoActivate = false;
-	OurParticleSystem->SetRelativeLocation(FVector(-20.0f, 0.0f, 20.0f));
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Game/StarterContent/Particles/P_Fire.P_Fire"));
-	if (ParticleAsset.Succeeded())
-	{
-		OurParticleSystem->SetTemplate(ParticleAsset.Object);
-	}
 
 	// Use a spring arm to give the camera smooth, natural-feeling motion.
 	USpringArmComponent* SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraAttachmentArm"));
@@ -54,12 +44,14 @@ ACollidingPawn::ACollidingPawn()
 	// Physics Constraint
 	TwistConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("TwistConstrant"));
 	TwistConstraint->ConstraintActor1 = RootComponent->GetAttachmentRootActor();
+	TwistConstraint->SetWorldLocation(BikeComponent->GetComponentLocation());
 	TwistConstraint->SetAngularTwistLimit(ACM_Limited, 0);
-	TwistConstraint->SetAngularOrientationDrive(true, true);
-	TwistConstraint->SetAngularDriveParams(10, 10, 10);
+	TwistConstraint->SetAngularOrientationDrive(false, true);
+	TwistConstraint->SetAngularDriveParams(1, 1, 1);
 	TwistConstraint->SetLinearXLimit(LCM_Free, 0);
 	TwistConstraint->SetLinearYLimit(LCM_Free, 0);
 	TwistConstraint->SetLinearZLimit(LCM_Free, 0);
+	BikeComponent->SetPhysicsMaxAngularVelocity(50, false);
 
 	// Animation Instance
 	static ConstructorHelpers::FObjectFinder<UAnimBlueprintGeneratedClass> BikeAnimBP(TEXT("/Game/Bike/BikeAnimBP.BikeAnimBP_C"));
@@ -84,27 +76,6 @@ void ACollidingPawn::BeginPlay()
 void ACollidingPawn::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	
-	if (!BikeComponent) return;
-	UBikeAnimInstance * Anim = Cast<UBikeAnimInstance>(BikeComponent->GetAnimInstance());
-	if (!Anim) return;
-	FRotator newTurnF = Anim->SkelControl_WheelRot_F;
-	FRotator newTurnB = Anim->SkelControl_WheelRot_B;
-	if (RootComponent->GetForwardVector().X > 0)
-	{
-		newTurnF.Pitch -= RootComponent->GetComponentVelocity().Size() / 75.f;
-		newTurnB.Pitch -= RootComponent->GetComponentVelocity().Size() / 75.f;
-	}
-	else
-	{
-		newTurnF.Pitch += RootComponent->GetComponentVelocity().Size() / 75.f;
-		newTurnB.Pitch += RootComponent->GetComponentVelocity().Size() / 75.f;
-	}
-	Anim->SkelControl_WheelRot_F = newTurnF;
-	Anim->SkelControl_WheelRot_B = newTurnB;
-
-	FRotator newTarget = FRotator(GetActorRotation().Pitch, GetActorRotation().Yaw, 0);
-	TwistConstraint->SetAngularOrientationTarget(newTarget);
 }
 
 // Called to bind functionality to input
@@ -121,31 +92,51 @@ void ACollidingPawn::SetupPlayerInputComponent(class UInputComponent* InputCompo
 
 void ACollidingPawn::MoveForward(float AxisValue)
 {
-	if (AxisValue != 0.f && BikeComponent->GetPhysicsLinearVelocity().Size() < 500)
+	int32 WheelFIdx = BikeComponent->GetPhysicsAsset()->FindBodyIndex(FName("PhyWHeel_F"));
+	if (WheelFIdx >= 0 && AxisValue != 0.f && BikeComponent->GetPhysicsLinearVelocity().Size() < 500)
 	{
-		FVector Direction = BikeComponent->GetForwardVector()*FMath::Clamp(AxisValue,0.f,1.f)*400;
-		BikeComponent->AddImpulse(Direction, FName("PhyWheel_B"), true);
+		FBodyInstance* wheelF = BikeComponent->Bodies[WheelFIdx];
+		// hack to apply force in the right direction regardless for actor rotation.
+		if (FMath::IsWithin(wheelF->GetUnrealWorldTransform().GetRotation().Z, -90.f, 90.f))
+		{
+			wheelF->AddAngularImpulse(FVector(0, 20 * FMath::Clamp(0.f, 1.f, AxisValue), 0), true);
+		}
+		else
+		{
+			wheelF->AddAngularImpulse(FVector(0, 20 * FMath::Clamp(0.f, 1.f, AxisValue), 0), true);
+		}
+		//TODO Use set angualr velocity based on speed of physical wheel
 	}
 
 }
 
 void ACollidingPawn::MoveRight(float AxisValue)
 {
+	// Get animation instance
 	if (!BikeComponent) return;
 	UBikeAnimInstance * Anim = Cast<UBikeAnimInstance>(BikeComponent->GetAnimInstance());
 	if (!Anim) return;
-	FRotator newTurn = Anim->SkelControl_WheelRot_F;
-	newTurn.Yaw = FMath::Clamp(AxisValue, -1.f, 1.f) * 70;
-	Anim->SkelControl_WheelRot_F = newTurn;
-	
-	int32 BodySetupIdx = BikeComponent->GetPhysicsAsset()->FindBodyIndex(FName("PhyWHeel_F"));
-	if (BodySetupIdx >= 0)
+
+	//Update front wheel
+	int32 WheelFIdx = BikeComponent->GetPhysicsAsset()->FindBodyIndex(FName("PhyWHeel_F"));
+	if (WheelFIdx >= 0)
 	{
-		FBodyInstance* BodyInstance = BikeComponent->Bodies[BodySetupIdx];
-		FRotator newRot = FRotator(0, GetActorRotation().Yaw + FMath::Clamp(AxisValue, -1.f, 1.f) * 70, 0);
-		FTransform newTrans = BodyInstance->GetUnrealWorldTransform();
-		newTrans.SetRotation(newRot.Quaternion());
-		BodyInstance->SetBodyTransform(newTrans, true);
+		//Update physics asset
+		FBodyInstance* WheelF = BikeComponent->Bodies[WheelFIdx];
+		FTransform wheelTrans = WheelF->GetUnrealWorldTransform();
+		FRotator rot = wheelTrans.Rotator();
+		rot.Yaw += AxisValue * MAX_TURN;
+		wheelTrans.SetRotation(rot.Quaternion());
+		WheelF->SetBodyTransform(wheelTrans, false);
+		//Update animation
+		Anim->SkelControl_WheelRot_F = WheelF->GetUnrealWorldTransform().Rotator();
+	}
+	//Update back wheel
+	int32 WheelBIdx = BikeComponent->GetPhysicsAsset()->FindBodyIndex(FName("PhyWheel_B"));
+	if (WheelBIdx >= 0)
+	{
+		//Update animation
+		Anim->SkelControl_WheelRot_B = BikeComponent->Bodies[WheelBIdx]->GetUnrealWorldTransform().Rotator();
 	}
 }
 
@@ -155,9 +146,5 @@ void ACollidingPawn::Turn(float AxisValue)
 
 void ACollidingPawn::ParticleToggle()
 {
-	if (OurParticleSystem && OurParticleSystem->Template)
-	{
-		OurParticleSystem->ToggleActive();
-	}
 }
 
