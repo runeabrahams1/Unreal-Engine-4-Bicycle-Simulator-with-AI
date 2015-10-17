@@ -50,11 +50,11 @@ ABikeV3Pawn::ABikeV3Pawn()
 	// Setup the wheels
 	// TODO Find a way to remove 2 wheels and still make it work
 	Vehicle4W->WheelSetups[0].WheelClass = UBikeV3WheelFront::StaticClass();
-	Vehicle4W->WheelSetups[0].BoneName = FName("PhyWheel_F");
+	Vehicle4W->WheelSetups[0].BoneName = FName("PhyWHeel_F");
 	Vehicle4W->WheelSetups[0].AdditionalOffset = FVector(0.f, 0.f, 0.f);
 
 	Vehicle4W->WheelSetups[1].WheelClass = UBikeV3WheelFront::StaticClass();
-	Vehicle4W->WheelSetups[1].BoneName = FName("PhyWheel_F");
+	Vehicle4W->WheelSetups[1].BoneName = FName("PhyWHeel_F");
 	Vehicle4W->WheelSetups[1].AdditionalOffset = FVector(0.f, 0.f, 0.f);
 
 	Vehicle4W->WheelSetups[2].WheelClass = UBikeV3WheelRear::StaticClass();
@@ -151,6 +151,18 @@ ABikeV3Pawn::ABikeV3Pawn()
 
 	bIsLowFriction = false;
 	bInReverseGear = false;
+
+	TwistConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("TwistConstrant"));
+	TwistConstraint->ConstraintActor1 = GetMesh()->GetAttachmentRootActor();
+	TwistConstraint->SetWorldLocation(GetActorLocation());
+	TwistConstraint->SetAngularTwistLimit(ACM_Limited, 0);
+	TwistConstraint->SetAngularOrientationDrive(false, true);
+	TwistConstraint->SetAngularDriveParams(1, 1, 200);
+	TwistConstraint->SetAngularOrientationTarget(FRotator(0.f, 0.f, 0.f));
+	TwistConstraint->SetLinearXLimit(LCM_Free, 0);
+	TwistConstraint->SetLinearYLimit(LCM_Free, 0);
+	TwistConstraint->SetLinearZLimit(LCM_Free, 0);
+
 }
 
 void ABikeV3Pawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -174,7 +186,7 @@ void ABikeV3Pawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 //TODO Make custom movement, don't use engine
 void ABikeV3Pawn::MoveForward(float Val)
 {
-	GetVehicleMovementComponent()->SetThrottleInput(Val);
+	GetMesh()->GetBodyInstance(FName("PhyWHeel_F"))->SetAngularVelocity(FVector(1, 1, 1) * 400,false);
 }
 
 void ABikeV3Pawn::MoveRight(float Val)
@@ -257,8 +269,6 @@ void ABikeV3Pawn::Tick(float Delta)
 	// Set the string in the incar hud
 	SetupInCarHUD();
 
-	//Hold bike standing
-	UpdateBikeOrientation();
 
 	bool bHMDActive = false;
 #ifdef HMD_INTGERATION
@@ -363,9 +373,5 @@ void ABikeV3Pawn::UpdatePhysicsMaterial()
 	}
 }
 
-void ABikeV3Pawn::UpdateBikeOrientation()
-{
-		GetMesh()->SetAllPhysicsRotation(FRotator(GetMesh()->GetComponentRotation().Pitch, GetMesh()->GetComponentRotation().Yaw, 0));
-}
 
 #undef LOCTEXT_NAMESPACE

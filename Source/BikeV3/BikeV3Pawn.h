@@ -38,6 +38,9 @@ class ABikeV3Pawn : public AWheeledVehicle
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* EngineSoundComponent;
 
+	UPROPERTY(Category = Constraints, EditAnywhere, meta = (AllowPrivateAcces = "true"))
+	UPhysicsConstraintComponent* TwistConstraint;
+
 public:
 	ABikeV3Pawn();
 
