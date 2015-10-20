@@ -12,9 +12,12 @@ UCLASS()
 class BIKEV3_API UCollidingPawnMovementComponent : public UPawnMovementComponent
 {
 	GENERATED_BODY()
-	
+private:
+
+	int readArduino();
 public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
-	
+	bool pressedBrakeLeft();
+	bool pressedBrake
 	
 };

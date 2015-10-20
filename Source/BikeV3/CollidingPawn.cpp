@@ -85,7 +85,7 @@ void ACollidingPawn::SetupPlayerInputComponent(class UInputComponent* InputCompo
 
 	InputComponent->BindAxis("MoveForward", this, &ACollidingPawn::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &ACollidingPawn::MoveRight);
-	InputComponent->BindAction("ParticleToggle",IE_Repeat, this, &ACollidingPawn::ParticleToggle);
+	InputComponent->BindAction("ParticleToggle",IE_Pressed, this, &ACollidingPawn::ParticleToggle);
 	InputComponent->BindAxis("Turn", this, &ACollidingPawn::Turn);
 
 }
@@ -108,13 +108,8 @@ void ACollidingPawn::MoveForward(float AxisValue)
 	if (WheelFIdx >= 0)
 	{
 		FBodyInstance* wheelF = BikeComponent->Bodies[WheelFIdx];
-		// hack to apply force in the right direction regardless for actor rotation.
 		FVector wheelDir = FVector(0.f, 1.f, 0.f);
-		wheelF->SetAngularVelocity(wheelDir * AxisValue * 50, true);
-		if (FMath::IsWithin(wheelF->, 0.f, 180.f))
-		{
-		}
-		//TODO Use set angualr velocity based on speed of physical wheel
+		wheelF->SetAngularVelocity(wheelDir * AxisValue * 500, false);
 	}
 
 }
@@ -138,7 +133,7 @@ void ACollidingPawn::MoveRight(float AxisValue)
 		rot.Pitch = 0;
 		rot.Roll = BikeComponent->GetComponentRotation().Roll;
 		wheelTrans.SetRotation(rot.Quaternion());
-		WheelF->SetBodyTransform(wheelTrans,true);
+		WheelF->SetBodyTransform(wheelTrans, ETeleportType::None);
 		//Update animation
 		Anim->SkelControl_WheelRot_F = rot;
 	}
@@ -157,6 +152,6 @@ void ACollidingPawn::Turn(float AxisValue)
 
 void ACollidingPawn::ParticleToggle()
 {
-	BikeComponent->AddImpulseAtLocation(FVector(0, 0, 100),BikeComponent->GetBoneLocation(FName("PhyWHeel_F")));
+	BikeComponent->AddImpulseAtLocation(FVector(0, 0, 10000),BikeComponent->GetBoneLocation(FName("PhyWHeel_F")));
 }
 
