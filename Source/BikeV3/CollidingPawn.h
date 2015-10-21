@@ -1,17 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#pragma once
-
 #include "GameFramework/Pawn.h"
 #include "CollidingPawn.generated.h"
 
-UCLASS(config=Game)
+
+UCLASS()
 class BIKEV3_API ACollidingPawn : public APawn
 {
 	GENERATED_BODY()
 
-	UPROPERTY(Category = Root, VisibleDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* BikeComponent;
+		UPROPERTY(Category = Root, VisibleDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+		USkeletalMeshComponent* BikeComponent;
 
 	UPROPERTY(Category = Constraints, EditAnywhere, meta = (AllowPrivateAcces = "true"))
 	UPhysicsConstraintComponent* TwistConstraint;
