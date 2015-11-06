@@ -253,7 +253,7 @@ void ABikeV3Pawn::EnableIncarView(const bool bState)
 	}
 }
 
-void ABikeV3Pawn::Tick(float Delta)
+void ABikeV3Pawn::CallTick(float Delta)
 {
 	// Setup the flag to say we are in reverse gear
 	bInReverseGear = GetVehicleMovement()->GetCurrentGear() < 0;
@@ -287,7 +287,7 @@ void ABikeV3Pawn::Tick(float Delta)
 	}	
 }
 
-void ABikeV3Pawn::BeginPlay()
+void ABikeV3Pawn::CallBeginPlay()
 {
 	bool bWantInCar = false;
 	// First disable both speed/gear displays

@@ -76,8 +76,11 @@ public:
 	// End Pawn interface
 
 	// Begin Actor interface
-	virtual void Tick(float Delta) override;
-	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintCallable, Category = func, meta = (AllowPrivateAcces = "true"))
+		void CallTick(float Delta);
+
+	UFUNCTION(BlueprintCallable, Category = func, meta = (AllowPrivateAcces = "true"))
+		void CallBeginPlay();
 	// End Actor interface
 
 	/** Handle pressing forwards */
