@@ -73,11 +73,12 @@ ABikeV3Pawn::ABikeV3Pawn()
 
 	// Engine 
 	// Torque setup
-	Vehicle4W->MaxEngineRPM = 500.0f;
+	Vehicle4W->MaxEngineRPM = 300.0f;
+	Vehicle4W->EngineSetup.MaxRPM = 300.f;
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->Reset();
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(0.0f, 400.0f);
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(200.f, 500.0f);
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(500.f, 400.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(0.0f, 100.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(200.f, 700.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(300.f, 500.0f);
  
 	// Adjust the steering 
 	Vehicle4W->SteeringCurve.GetRichCurve()->Reset();
@@ -96,11 +97,11 @@ ABikeV3Pawn::ABikeV3Pawn()
 	UPrimitiveComponent* UpdatedPrimitive = Cast<UPrimitiveComponent>(Vehicle4W->UpdatedComponent);
 	if (UpdatedPrimitive)
 	{
-		UpdatedPrimitive->BodyInstance.COMNudge = FVector(0.0f, 0.0f, 0.0f);
+		UpdatedPrimitive->BodyInstance.COMNudge = FVector(0.0f, 0.0f, 75.0f);
 	}
 
 	// Set the inertia scale. This controls how the mass of the vehicle is distributed.
-	Vehicle4W->InertiaTensorScale = FVector(1.0f, 1.0f, 1.0f);
+	Vehicle4W->InertiaTensorScale = FVector(1.0f, 10.0f, 1.0f);
 
 	// Create a spring arm component for our chase camera (TODO Should be removed, just for testing)
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -154,11 +155,8 @@ ABikeV3Pawn::ABikeV3Pawn()
 
 	TwistConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("TwistConstrant"));
 	TwistConstraint->ConstraintActor1 = GetMesh()->GetAttachmentRootActor();
-	TwistConstraint->SetWorldLocation(GetActorLocation());
 	TwistConstraint->SetAngularTwistLimit(ACM_Limited, 0);
-	TwistConstraint->SetAngularOrientationDrive(false, true);
-	TwistConstraint->SetAngularDriveParams(1, 1, 200);
-	TwistConstraint->SetAngularOrientationTarget(FRotator(0.f, 0.f, 0.f));
+	TwistConstraint->SetAngularDriveParams(15, 150, 10000);
 	TwistConstraint->SetLinearXLimit(LCM_Free, 0);
 	TwistConstraint->SetLinearYLimit(LCM_Free, 0);
 	TwistConstraint->SetLinearZLimit(LCM_Free, 0);
