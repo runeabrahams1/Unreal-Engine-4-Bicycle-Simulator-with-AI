@@ -186,7 +186,7 @@ void ABikeV3Pawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 //TODO Make custom movement, don't use engine
 void ABikeV3Pawn::MoveForward(float Val)
 {
-	GetMesh()->GetBodyInstance(FName("PhyWHeel_F"))->SetAngularVelocity(FVector(1, 1, 1) * 400,false);
+	GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
 void ABikeV3Pawn::MoveRight(float Val)

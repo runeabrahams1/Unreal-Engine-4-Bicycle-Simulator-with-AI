@@ -7,15 +7,15 @@
 
 UBikeIgnoreWheel::UBikeIgnoreWheel()
 {
-	ShapeRadius = 0.0f;
-	ShapeWidth = 0.0f;
+	ShapeRadius = 5.0f;
+	ShapeWidth = 1.0f;
 	bAffectedByHandbrake = false;
 	SteerAngle = 0.0f;
 
 	// Setup suspension forces
-	SuspensionForceOffset = -4.0f;
-	SuspensionMaxRaise = 10.0f;
-	SuspensionMaxDrop = 10.0f;
+	SuspensionForceOffset = 0.0f;
+	SuspensionMaxRaise = 0.0f;
+	SuspensionMaxDrop = 0.0f;
 	SuspensionNaturalFrequency = 9.0f;
 	SuspensionDampingRatio = 1.05f;
 
