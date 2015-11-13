@@ -41,6 +41,9 @@ class ABikeV3Pawn : public AWheeledVehicle
 	UPROPERTY(Category = Constraints, EditAnywhere, meta = (AllowPrivateAcces = "true"))
 	UPhysicsConstraintComponent* TwistConstraint;
 
+	UPROPERTY(Category = Vehicle, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USkeletalMesh* Rider;
+
 public:
 	ABikeV3Pawn();
 
@@ -105,7 +108,10 @@ public:
 	/** Handle Gearing */
 	void ShiftUp();
 	void ShiftDown();
+
 	void UpdateBikeOrientation();
+
+	void UpdateRider();
 
 	static const FName LookUpBinding;
 	static const FName LookRightBinding;

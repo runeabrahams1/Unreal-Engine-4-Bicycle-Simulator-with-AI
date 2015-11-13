@@ -33,6 +33,9 @@ ABikeV3Pawn::ABikeV3Pawn()
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/Bicycle/BicycleSkeleton.BicycleSkeleton"));
 	GetMesh()->SetSkeletalMesh(CarMesh.Object);
 
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> RiderMesh(TEXT("/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin"));
+	Rider = RiderMesh.Object;
+	Rider->AddToRoot();
 
 	// Setup friction materials
 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> SlipperyMat(TEXT("/Game/VehicleAdv/PhysicsMaterials/Slippery.Slippery"));
@@ -266,6 +269,8 @@ void ABikeV3Pawn::CallTick(float Delta)
 	// Set the string in the incar hud
 	SetupInCarHUD();
 
+	UpdateRider();
+
 
 	bool bHMDActive = false;
 #ifdef HMD_INTGERATION
@@ -368,6 +373,16 @@ void ABikeV3Pawn::UpdatePhysicsMaterial()
 			bIsLowFriction = true;
 		}
 	}
+}
+
+void ABikeV3Pawn::UpdateRider()
+{
+	USkeletalMeshSocket* pelvis = Rider->FindSocket(FName("pelvis"));
+}
+
+void ABikeV3Pawn::UpdateBikeOrientation()
+{
+
 }
 
 
