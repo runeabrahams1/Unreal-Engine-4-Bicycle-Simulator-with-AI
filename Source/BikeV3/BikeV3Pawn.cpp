@@ -14,6 +14,7 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Vehicles/WheeledVehicleMovementComponent4W.h"
 #include "Engine/SkeletalMesh.h"
+#include "RiderAnimation.h"
 
 
 #ifdef HMD_INTGERATION
@@ -32,10 +33,6 @@ ABikeV3Pawn::ABikeV3Pawn()
 	// Bike mesh
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CarMesh(TEXT("/Game/Bicycle/BicycleSkeleton.BicycleSkeleton"));
 	GetMesh()->SetSkeletalMesh(CarMesh.Object);
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> RiderMesh(TEXT("/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin"));
-	Rider = RiderMesh.Object;
-	Rider->AddToRoot();
 
 	// Setup friction materials
 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> SlipperyMat(TEXT("/Game/VehicleAdv/PhysicsMaterials/Slippery.Slippery"));
@@ -155,13 +152,13 @@ ABikeV3Pawn::ABikeV3Pawn()
 	bIsLowFriction = false;
 	bInReverseGear = false;
 
-	TwistConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("TwistConstrant"));
-	TwistConstraint->ConstraintActor1 = GetMesh()->GetAttachmentRootActor();
-	TwistConstraint->SetAngularTwistLimit(ACM_Limited, 0);
-	TwistConstraint->SetAngularDriveParams(15, 150, 10000);
-	TwistConstraint->SetLinearXLimit(LCM_Free, 0);
-	TwistConstraint->SetLinearYLimit(LCM_Free, 0);
-	TwistConstraint->SetLinearZLimit(LCM_Free, 0);
+	//TwistConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("TwistConstrant"));
+	//TwistConstraint->ConstraintActor1 = GetMesh()->GetAttachmentRootActor();
+	//TwistConstraint->SetAngularTwistLimit(ACM_Limited, 0);
+	//TwistConstraint->SetAngularDriveParams(15, 150, 10000);
+	//TwistConstraint->SetLinearXLimit(LCM_Free, 0);
+	//TwistConstraint->SetLinearYLimit(LCM_Free, 0);
+	//TwistConstraint->SetLinearZLimit(LCM_Free, 0);
 
 }
 
@@ -377,7 +374,7 @@ void ABikeV3Pawn::UpdatePhysicsMaterial()
 
 void ABikeV3Pawn::UpdateRider()
 {
-	USkeletalMeshSocket* pelvis = Rider->FindSocket(FName("pelvis"));
+
 }
 
 void ABikeV3Pawn::UpdateBikeOrientation()

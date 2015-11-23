@@ -16,4 +16,5 @@ class BIKEV3_API ABikePlayerController : public APlayerController
 	ABikePlayerController();
 	
 	virtual void SetupInputComponent() override;
+
 };

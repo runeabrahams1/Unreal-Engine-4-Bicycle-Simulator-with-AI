@@ -5,7 +5,6 @@
 
 ABikePlayerController::ABikePlayerController()
 {
-
 }
 
 void ABikePlayerController::SetupInputComponent()
