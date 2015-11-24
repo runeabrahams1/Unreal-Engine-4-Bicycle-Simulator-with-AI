@@ -10,7 +10,6 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/TextRenderComponent.h"
-#include "Sound/SoundCue.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Vehicles/WheeledVehicleMovementComponent4W.h"
 #include "Engine/SkeletalMesh.h"
@@ -70,22 +69,22 @@ ABikeV3Pawn::ABikeV3Pawn()
 	Vehicle4W->MaxNormalizedTireLoad = 2.0f;
 	Vehicle4W->MaxNormalizedTireLoadFiltered = 2.0f;
 
-	// Engine 
+	// Engine (Adjuct in BP in Engine)
 	// Torque setup
 	Vehicle4W->MaxEngineRPM = 300.0f;
 	Vehicle4W->EngineSetup.MaxRPM = 300.f;
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->Reset();
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(0.0f, 100.0f);
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(200.f, 700.0f);
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(300.f, 500.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(0.0f, 750.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(150.f, 850.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(300.f, 800.0f);
  
-	// Adjust the steering 
+	// Adjust the steering (Adjuct in BP in Engine)
 	Vehicle4W->SteeringCurve.GetRichCurve()->Reset();
 	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(0.0f, 1.0f);
 	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(10.0f, 0.7f);
 	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(50.0f, 0.2f);
 			
- 	// Transmission, TODO( Adjust if you go to 2 wheels)
+ 	// Transmission (Adjuct in BP in Engine)
 	Vehicle4W->DifferentialSetup.DifferentialType = EVehicleDifferential4W::Open_RearDrive;
 
 	Vehicle4W->TransmissionSetup.bUseGearAutoBox = false;
@@ -96,11 +95,11 @@ ABikeV3Pawn::ABikeV3Pawn()
 	UPrimitiveComponent* UpdatedPrimitive = Cast<UPrimitiveComponent>(Vehicle4W->UpdatedComponent);
 	if (UpdatedPrimitive)
 	{
-		UpdatedPrimitive->BodyInstance.COMNudge = FVector(0.0f, 0.0f, 75.0f);
+		UpdatedPrimitive->BodyInstance.COMNudge = FVector(0.0f, 0.0f, -20.0f);
 	}
 
 	// Set the inertia scale. This controls how the mass of the vehicle is distributed.
-	Vehicle4W->InertiaTensorScale = FVector(1.0f, 10.0f, 1.0f);
+	Vehicle4W->InertiaTensorScale = FVector(1.0f, 25.0f, 1.0f);
 
 	// Create a spring arm component for our chase camera (TODO Should be removed, just for testing)
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -152,14 +151,6 @@ ABikeV3Pawn::ABikeV3Pawn()
 	bIsLowFriction = false;
 	bInReverseGear = false;
 
-	//TwistConstraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("TwistConstrant"));
-	//TwistConstraint->ConstraintActor1 = GetMesh()->GetAttachmentRootActor();
-	//TwistConstraint->SetAngularTwistLimit(ACM_Limited, 0);
-	//TwistConstraint->SetAngularDriveParams(15, 150, 10000);
-	//TwistConstraint->SetLinearXLimit(LCM_Free, 0);
-	//TwistConstraint->SetLinearYLimit(LCM_Free, 0);
-	//TwistConstraint->SetLinearZLimit(LCM_Free, 0);
-
 }
 
 void ABikeV3Pawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -175,8 +166,6 @@ void ABikeV3Pawn::SetupPlayerInputComponent(class UInputComponent* InputComponen
 	InputComponent->BindAction("Handbrake", IE_Pressed, this, &ABikeV3Pawn::OnHandbrakePressed);
 	InputComponent->BindAction("Handbrake", IE_Released, this, &ABikeV3Pawn::OnHandbrakeReleased);
 	InputComponent->BindAction("SwitchCamera", IE_Pressed, this, &ABikeV3Pawn::OnToggleCamera);
-	InputComponent->BindAction("ShiftUp", IE_Pressed, this, &ABikeV3Pawn::ShiftUp);
-	InputComponent->BindAction("ShiftDown", IE_Pressed, this, &ABikeV3Pawn::ShiftDown);
 	InputComponent->BindAction("ResetVR", IE_Pressed, this, &ABikeV3Pawn::OnResetVR); 
 }
 
@@ -191,21 +180,6 @@ void ABikeV3Pawn::MoveRight(float Val)
 	GetVehicleMovementComponent()->SetSteeringInput(Val);
 }
 
-void ABikeV3Pawn::ShiftUp()
-{
-	if (GetVehicleMovementComponent()->GetCurrentGear() < 5)
-	{
-		GetVehicleMovementComponent()->SetTargetGear(GetVehicleMovementComponent()->GetCurrentGear() + 1, true);
-	}
-}
-
-void ABikeV3Pawn::ShiftDown()
-{
-	if (GetVehicleMovementComponent()->GetCurrentGear() > -1)
-	{
-		GetVehicleMovementComponent()->SetTargetGear(GetVehicleMovementComponent()->GetCurrentGear() - 1, true);
-	}
-}
 
 //TODO Try to amke ABS like brakes
 void ABikeV3Pawn::OnHandbrakePressed()
@@ -265,8 +239,6 @@ void ABikeV3Pawn::CallTick(float Delta)
 
 	// Set the string in the incar hud
 	SetupInCarHUD();
-
-	UpdateRider();
 
 
 	bool bHMDActive = false;
@@ -372,10 +344,6 @@ void ABikeV3Pawn::UpdatePhysicsMaterial()
 	}
 }
 
-void ABikeV3Pawn::UpdateRider()
-{
-
-}
 
 void ABikeV3Pawn::UpdateBikeOrientation()
 {

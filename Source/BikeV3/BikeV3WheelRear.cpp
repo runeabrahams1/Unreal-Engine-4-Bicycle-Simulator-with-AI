@@ -12,14 +12,14 @@ UBikeV3WheelRear::UBikeV3WheelRear()
 	SteerAngle = 0.0f;
 
 	// Setup suspension forces
-	SuspensionForceOffset = 0.0f;
+	SuspensionForceOffset = -2.5f;
 	SuspensionMaxRaise = 0.0f;
-	SuspensionMaxDrop = 0.0f;
+	SuspensionMaxDrop = 5.0f;
 	SuspensionNaturalFrequency = 9.0f;
 	SuspensionDampingRatio = 1.05f;
 
 	// Find the tire object and set the data for it
 	static ConstructorHelpers::FObjectFinder<UTireType> TireData(TEXT("/Game/Bicycle/WheelData/BicycleTire.BicycleTire"));
 	TireType = TireData.Object;
-	TireType->SetFrictionScale(10.f);
+	TireType->SetFrictionScale(15.f);
 }

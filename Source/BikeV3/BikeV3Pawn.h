@@ -34,15 +34,6 @@ class ABikeV3Pawn : public AWheeledVehicle
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UTextRenderComponent* InCarGear;
 
-	/** Audio component for the engine sound */
-	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UAudioComponent* EngineSoundComponent;
-
-	UPROPERTY(Category = Constraints, EditAnywhere, meta = (AllowPrivateAcces = "true"))
-	UPhysicsConstraintComponent* TwistConstraint;
-
-	UPROPERTY(Category = Vehicle, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USkeletalMesh* Rider;
 
 public:
 	ABikeV3Pawn();
@@ -105,17 +96,11 @@ public:
 	void OnToggleCamera();
 	/** Handle reset VR device */
 	void OnResetVR();
-	/** Handle Gearing */
-	void ShiftUp();
-	void ShiftDown();
 
 	void UpdateBikeOrientation();
 
-	void UpdateRider();
-
 	static const FName LookUpBinding;
 	static const FName LookRightBinding;
-	static const FName EngineAudioRPM;
 
 private:
 	/** 
@@ -147,6 +132,4 @@ public:
 	FORCEINLINE UTextRenderComponent* GetInCarSpeed() const { return InCarSpeed; }
 	/** Returns InCarGear subobject **/
 	FORCEINLINE UTextRenderComponent* GetInCarGear() const { return InCarGear; }
-	/** Returns EngineSoundComponent subobject **/
-	FORCEINLINE UAudioComponent* GetEngineSoundComponent() const { return EngineSoundComponent; }
 };
