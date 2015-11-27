@@ -240,6 +240,8 @@ void ABikeV3Pawn::CallTick(float Delta)
 	// Set the string in the incar hud
 	SetupInCarHUD();
 
+	UpdateBikeOrientation();
+
 
 	bool bHMDActive = false;
 #ifdef HMD_INTGERATION
@@ -347,7 +349,13 @@ void ABikeV3Pawn::UpdatePhysicsMaterial()
 
 void ABikeV3Pawn::UpdateBikeOrientation()
 {
+	float pitch = GetMesh()->GetComponentRotation().Pitch;
+	float roll = GetMesh()->GetComponentRotation().Roll;
 
+	float scale = -2.0;
+
+	//GetMesh()->SetCenterOfMass(FVector(scale*pitch, scale*roll, 100.0f));
+	//GetMesh()->SetCenterOfMass(FVector(0.f, 0.f, 100.0f));
 }
 
 
