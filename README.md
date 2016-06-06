@@ -13,8 +13,12 @@ The simulator was made by me as part of a cource-project the Norwegian Universit
 A short video demo of the cyclist model can be found at https://youtu.be/06Libu_58Ho, while a playlist with tests of the AI can be found at https://www.youtube.com/playlist?list=PLyQ2lVssCiGuufULltdKYA5pcY2pwBqiy.
 
 
-To get the code: \n
-1. I recommend to just download it as a zip. It will probably go much faster due the the size (~150MB). \n
-2. Install Unreal 4 (and possible Visual Studio 2015). \n
-3. Launch the BikeV3.uproject file. This should compile the project. \n
+To get the code:
+
+1. I recommend to just download it as a zip. It will probably go much faster due the the size (~150MB).
+
+2. Install Unreal 4 (and possible Visual Studio 2015).
+
+3. Launch the BikeV3.uproject file. This should compile the project.
+
 4. It is a UE4 C++ project. Generating Visual Studio files will help with debugging if the code can't compile.
